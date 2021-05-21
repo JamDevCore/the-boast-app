@@ -120,3 +120,8 @@
     flex-direction: column;
   }
 }
+
+
+body {
+  background-image: url('../public/cool-background.svg');
+}
