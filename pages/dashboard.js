@@ -2,7 +2,7 @@ import React from "react";
 import styled from 'styled-components';
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import Link from 'next/link'
-import Navbar from '../components/Navbar';
+import Navbar from '../components/navbar';
 import Image from 'next/image'
 import { connectToDatabase } from "../utils/mongodb";
 // import NewPost from './new-post';
@@ -13,66 +13,31 @@ import { ObjectId } from "bson";
 // import Snippet from './snippet';
 // import SEO from './seo';
 
-const Menu = styled.div`
-  max-width: 250px;
-`
+
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ')
+}
+
+
+// const Menu = styled.div`
+//   max-width: 250px;
+// `
 
 const Dashboard = ({ className, user, posts }) => {
     console.log(user)
     console.log('posts', posts)
-    // this.setEditing = this.setEditing.bind(this);
-
-//   setEditing(post) {
-//     this.setState({
-//       editingPost: post,
-//     })
-//   }
-
-//   updateView(view) {
-//     this.setState({
-//       currentView: view,
-//     })
-//   }
-//   renderSnippetView() {
-//     const { user } = this.props;
-//     return <Snippet
-//       userId={user.sub}
-//       />
-//   }
-
-//   renderEditPostView() {
-//     const { user } = this.props;
-//     const { editingPost } = this.state;
-//     return <NewPost
-//         setEditing={this.setEditing}
-//         post={editingPost}
-//         postId={editingPost && editingPost._id}
-//         userId={user.sub}
-//         updateView={this.updateView}
-//       />
-//   }
-
-//   renderNewPostView() {
-//     const { user } = this.props;
-//     const { editingPost } = this.state;
-//     return <NewPost post={editingPost} userId={user.sub} updateView={this.updateView}/>
-//   }
       return (
-        <div className={className}>
-          {/* <SEO
-            title="Boast | Get insights into your latest features"
-            showBoast={true}
-            userId={user.sub}
-            /> */}
-          <div className="Page">
-            <h1>Boast</h1>
-              <div className="Layout">
-               <Navbar />
-              <Posts posts={posts} />
-          </div>
-          </div>
-          <div className="accredit">Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/"     title="Flaticon">www.flaticon.com</a> messages.attribution.is_licensed_by <a href="http://creativecommons.org/licenses/by/3.0/"     title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+    <div>
+      <Navbar userId={user.user.id} />
+      <main>
+        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+          {/* Replace with your content */}
+          <Posts posts={posts} />
+          {/* /End replace */}
         </div>
+      </main>
+    </div>
       );
     }
 
@@ -124,7 +89,6 @@ export async function getServerSideProps(ctx) {
       return {}
     }
     const { db } = await connectToDatabase();
-    console.log(db)
     const posts = await db
       .collection("posts")
       .find({ userId: ObjectId(session.user.id)})

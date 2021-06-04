@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Navbar from '../../components/Navbar';
+import Navbar from '../../components/navbar';
+import { useRouter } from 'next/router'
 import { connectToDatabase } from '../../utils/mongodb';
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import { ObjectId } from 'bson';
@@ -55,8 +56,8 @@ const Button = styled.button`
 `
 const apiKey = process.env.GATSBY_DOOPOLLAPI;
 
-const createNewPost = async(post) => {
-    await axios.post('/api/posts', { post })
+const editPost = async(post) => {
+    await axios.put('/api/posts', { post })
 }
 
 const NewPost = ({ className , user, post }) => {
@@ -76,7 +77,7 @@ const NewPost = ({ className , user, post }) => {
   return(
       <div className={className}>
           <div className="Container">
-              <Navbar />
+              <Navbar userId={user.user.id} />
             <div className='NewPost'>
 
                 <h4>{type !== 'question' ? 'Heading (required)' : 'Question'}</h4>
@@ -157,7 +158,7 @@ const NewPost = ({ className , user, post }) => {
                     </div>)}
                     <Button onClick={() => {
                         console.log(questionStyle)
-                       createNewPost({
+                       editPost({
                         "title": heading,
                         text,
                         link,
@@ -166,6 +167,8 @@ const NewPost = ({ className , user, post }) => {
                         userId: user.user.id,
                         options: Array.from(document.querySelectorAll('.options')).filter(op => op.value).map(op => op.value),
                        });
+                       const router = useRouter()
+                       router.push('/dashboard');
                     }}>{!isLoading ? 'Save' : 'Saving..'}</Button>
                 </div>
                 </div>
@@ -197,7 +200,6 @@ export async function getServerSideProps(ctx) {
 
 export default styled(NewPost)`
 .Container {
-    width: 800px;
     margin: 0 auto;
 }
     width: 100%;

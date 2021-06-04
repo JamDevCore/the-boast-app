@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Navbar from '../components/Navbar';
+import Navbar from '../components/navbar';
+import { useRouter } from 'next/router'
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import axios from 'axios';
+import { unstable_renderSubtreeIntoContainer } from 'react-dom';
 
 const Input = styled.input`
   width: 100%;
@@ -58,6 +60,7 @@ const createNewPost = async(post) => {
     await axios.post('/api/posts', { post })
 }
 
+
 const NewPost = ({ className , user, post }) => {
     console.log(post)
   const [heading, setHeading] = useState();
@@ -71,11 +74,13 @@ const NewPost = ({ className , user, post }) => {
   const [questionStyle, setQuestionStyle] = useState();
   const [isLoading, setLoading] = useState(false);
   // Sending the post
-
+  const router = useRouter()
+                   
   return(
       <div className={className}>
+                     <Navbar  userId={user.user.id}/>
           <div className="Container">
-              <Navbar />
+   
             <div className='NewPost'>
 
                 <h4>{type !== 'question' ? 'Heading (required)' : 'Question'}</h4>
@@ -132,7 +137,6 @@ const NewPost = ({ className , user, post }) => {
                         defaultValue={questionStyle || 'singleSlider'}
                         onChange={(e) => setQuestionStyle(e.target.value)}
                         >
-                        <option value="singleSlider">Slider</option>
                         <option value="multipleChoice">Multiple choice</option>
                         </Select>
                     </div>)}
@@ -165,6 +169,7 @@ const NewPost = ({ className , user, post }) => {
                         userId: user.user.id,
                         options: Array.from(document.querySelectorAll('.options')).filter(op => op.value).map(op => op.value),
                        });
+                       router.push('/dashboard');
                     }}>{!isLoading ? 'Save' : 'Saving..'}</Button>
                 </div>
                 </div>
@@ -192,7 +197,6 @@ export async function getServerSideProps(ctx) {
 
 export default styled(NewPost)`
 .Container {
-    width: 800px;
     margin: 0 auto;
 }
     width: 100%;

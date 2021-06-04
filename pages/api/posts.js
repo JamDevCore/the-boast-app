@@ -3,10 +3,10 @@ import { ObjectId } from "bson";
 
 export default async function handler(req, res) {
     const { body } = req;
-    console.log(body, body.post)
-    console.log(req.method)
+    console.log('yo', req.method)
+    const { db  }= await connectToDatabase();
     if (req.method === 'POST') {
-      const { db  }= await connectToDatabase();
+
       const { post } = body;
       console.log('post', post)
       if(post) {
@@ -17,6 +17,7 @@ export default async function handler(req, res) {
             link: post.link,
             text: post.text,
             date: new Date(),
+            hearts: 0,
             responses: 0,
             type: post.type,
             questionStyle: post.questionStyle || null,
@@ -28,7 +29,49 @@ export default async function handler(req, res) {
             throw new Error('No data received');
         }
       res.send('complete')
-    } else {
-      // Handle any other HTTP method
+    } else if (req.method === 'PUT') {
+      const { post, option } = body;
+
+      if(option) {
+        const oldPost = await db.collection('posts').findOne({ _id: ObjectId(post) })
+        const newPost = JSON.parse(JSON.stringify(oldPost))
+        const newOptions = oldPost.options.map(op => {
+          if(op._id.toString() === option) {
+            console.log('here')
+            const newOp = JSON.parse(JSON.stringify(op));
+            newOp.score += 1;
+            newOp.responses += 1;
+            console.log('new', newOp);
+            return newOp;
+          }
+          return op;
+        })
+        console.log(newOptions)
+        await db.collection('posts')
+        .updateOne({
+                _id: ObjectId(post)
+            }, {
+              $set: {
+                options: newOptions
+              },
+              $inc: {
+                responses: 1,
+              }
+            });
+            res.send('complete')
+        } else if(body.isLike) {
+          const result = await db.collection('posts')
+          .updateOne({
+                  _id: ObjectId(post)
+              }, {
+                $inc: {
+                  hearts: 1,
+                }
+              });
+              res.send('complete')
+        }
+        else {
+            throw new Error('No data received');
+        } 
     }
   }
