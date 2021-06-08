@@ -1,10 +1,11 @@
-import React from 'react';
+import React,{ useState } from 'react';
 import styled from 'styled-components';
-
+import { useRouter } from 'next/router'
 
 import {
   HeartIcon,
 } from '@heroicons/react/outline'
+import axios from 'axios';
 
 const Button = styled.button`
   border: none;
@@ -85,48 +86,42 @@ const OptionScore = styled.div`
     width: ${({ score }) => `${score}%`}
   }
 `
-class Posts extends React.Component {
-  constructor() {
-    super()
-    this.state = {
-      posts: [],
-      isLoading: false,
-      isDeleting: false,
-    }
-  }
-
-  renderPollResults(post) {
-    console.log('ere')
-    return (
-        <div className="Options my-8">
-          {post.options.map(option => {
-            return (
-              <div key={option._id}>
-                {post.questionStyle === 'singleSlider' ?
-                  (<div className="rangeLabels">
-                    <p>{post.minLabel || 'Min'}</p>
-                    <p>{post.maxLabel || "Max"}</p>
-                  </div>)
-                   :
-                   (<label>{option.label}</label>)}
-                <OptionScore score={Math.floor(((option.score / post.responses) * 100))}>
-                  <span><p>{`${Math.floor(((option.score / post.responses * 100)))}%`}</p></span>
-                </OptionScore>
-              </div>
-            )
-          })}
-        </div>)
-  }
 
 
+const PollResults = ({ post }) => {
+  console.log('ere')
+  return (
+      <div className="Options my-8">
+        {post.options.map(option => {
+          return (
+            <div key={option._id}>
+              {post.questionStyle === 'singleSlider' ?
+                (<div className="rangeLabels">
+                  <p>{post.minLabel || 'Min'}</p>
+                  <p>{post.maxLabel || "Max"}</p>
+                </div>)
+                 :
+                 (<label>{option.label}</label>)}
+              <OptionScore score={Math.floor(((option.score / post.responses) * 100))}>
+                <span><p>{`${Math.floor(((option.score / post.responses * 100)))}%`}</p></span>
+              </OptionScore>
+            </div>
+          )
+        })}
+      </div>)
+}
 
-  render() {
-    const { className, setEditing, updateView, posts} = this.props;
-    const { isLoading, confirmDialog, isDeleting } = this.state;
-    console.log(',yfriend', posts)
-    return (
+const Posts = ({
+  className, setEditing, updateView, posts
+}) => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+
+    const orderedPosts = posts && posts.length >0 && posts.sort((a,b) => new Date(b.date) - new Date(a.date));
+    return  (
     <div>
-      {!isLoading && posts && posts.length ? posts.map((post, index) => <div className="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
+      {!isLoading && orderedPosts && orderedPosts.length ? orderedPosts.map((post, index) => <div className="bg-white px-4 py-5 border-b border-gray-200 sm:px-6">
       <div className="-ml-4 -mt-4  items-center justify-center flex-wrap sm:flex-nowrap">
         <div className="ml-4 w-full mt-4">
           <div className="flex w-full justify-between">
@@ -146,10 +141,19 @@ class Posts extends React.Component {
            className="ml-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           isDelete
           onBlur={() => this.setState({ isDeleting: false })}
-          onClick={() => {
-            this.deleteRecord(post._id)
+          onClick={async () => {
+            console.log('hellothere', post._id, post.title)
+            setIsLoading(true)
+            await axios.delete('/api/posts', {
+              data: {
+                post: post._id,
+              },
+            })    
+            router.reload();
+
+            
           }}
-          >{isDeleting === post._id ? 'Really? Click to confirm' : 'Delete'}</button>
+          >{isLoading ? 'Deleting..' : 'Delete'}</button>
         </div>
         </div>
           <div className="Post w-full mt-5" key={`${post._id} - ${index} - ${post.question && post.question._id}`}>
@@ -163,17 +167,15 @@ class Posts extends React.Component {
         </div>
         <a className="my-4 block" href={post.link}>{post.link}</a>
         <p className="my-8">{post.text && post.text}</p>
-        {post.type === 'question' && this.renderPollResults(post)}
+        {post.type === 'question' && <PollResults post={post} />}
  
       </div>
         </div>
 
       </div>
     </div>) : null}
-  </div>)
-  }
+  </div>);
 }
-
 
 export default styled(Posts)`
   h3 {

@@ -1,10 +1,23 @@
 import { connectToDatabase } from '../../utils/mongodb';
 import { ObjectId } from "bson";
 
+
+const deletePost = async (post, db, res) => {
+  await db.collection('posts').deleteOne({ _id: ObjectId(post) });
+  res.send('complete');
+}
+
 export default async function handler(req, res) {
     const { body } = req;
-    console.log('yo', req.method)
+    console.log('yo', req.body)
     const { db  }= await connectToDatabase();
+    if(req.method ==='DELETE') {
+      const { post } = body;
+      console.log(post)
+      if(post) {
+        await deletePost(post, db, res);
+      }
+    }
     if (req.method === 'POST') {
 
       const { post } = body;
@@ -25,12 +38,40 @@ export default async function handler(req, res) {
               return { label: op, _id: new ObjectId(), score: 0, responses: 0 };
             }),
         });
+        res.send('complete')
         } else {
             throw new Error('No data received');
         }
-      res.send('complete')
     } else if (req.method === 'PUT') {
-      const { post, option } = body;
+      const { post, option, status } = body;
+      if(status === 'updatePost') {
+        const oldPost = await db.collection('posts').findOne({ _id: ObjectId(post) })
+        const newPost = JSON.parse(JSON.stringify(oldPost));
+        newPost.title = post.title
+        newPost.text = post.text;
+        newPost.link = post.link;
+        newPost.type = post.type;
+        newPost.questionStyle = post.questionStyle;
+        newPost.options = newPost.options.map(op => {
+          const newOP = JSON.parse(JSON.stringify(op));
+          const option = oldPost.options.filter(o => o._id === op._id)[0];
+          newOp.label = 
+          console.log(option)
+        })
+        options: Array.from
+        await db.collection('posts')
+        .updateOne({
+                _id: ObjectId(post)
+            }, {
+              $set: {
+                options: newOptions
+              },
+              $inc: {
+                responses: 1,
+              }
+            });
+            res.send('complete')
+      }
 
       if(option) {
         const oldPost = await db.collection('posts').findOne({ _id: ObjectId(post) })

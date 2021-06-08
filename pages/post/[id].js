@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Navbar from '../../components/navbar';
-import { useRouter } from 'next/router'
 import { connectToDatabase } from '../../utils/mongodb';
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import { ObjectId } from 'bson';
+import { useRouter } from 'next/router'
 
 const Input = styled.input`
   width: 100%;
@@ -57,11 +57,12 @@ const Button = styled.button`
 const apiKey = process.env.GATSBY_DOOPOLLAPI;
 
 const editPost = async(post) => {
-    await axios.put('/api/posts', { post })
+    console.log(post)
+    await axios.put('/api/posts', { date: { post, status:'updatePost' }});
 }
 
 const NewPost = ({ className , user, post }) => {
-    console.log(post)
+  const router = useRouter()
   const [heading, setHeading] = useState(post.title);
   const [headingFocused, setHeadingFocused] = useState(false);
   const [link, setLink] = useState(post.link);
@@ -78,102 +79,144 @@ const NewPost = ({ className , user, post }) => {
       <div className={className}>
           <div className="Container">
               <Navbar userId={user.user.id} />
-            <div className='NewPost'>
+<div className="m-4 p-8 sm:w-full lg:w-2/3">
 
-                <h4>{type !== 'question' ? 'Heading (required)' : 'Question'}</h4>
-                <Input
-                placeholder={!headingFocused ? "Add a snappy heading" : ''}
-                type="text"
-                name="title"
-                defaultValue={heading}
-                onBlur={() => setHeadingFocused(false)}
-                onFocus={() => setHeadingFocused(true)}
-                onChange={(e) => setHeading(e.target.value)}
+    <form className="space-y-8 divide-y divide-gray-200">
+      <div className="space-y-8 divide-y divide-gray-200">
+        <div>
+          <div>
+            <h3 className="text-lg leading-6 font-medium text-gray-900">Your post</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              Create & edit your post
+            </p>
+          </div>
+          <div className="pt-2">
+
+<div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+
+
+  <div className="col-span-6 w-full">
+    <label htmlFor="country" className="block text-sm font-medium text-gray-700">
+      Type
+    </label>
+    <div className="mt-1 w-full">
+      <select
+        className="shadow-sm p-2 w-full focus:ring-indigo-500 focus:border-indigo-500 block border border-gray-300 w-full sm:text-sm border-gray-300 rounded-md"
+               defaultValue={post.type}
+               onChange={(e) => setType(e.target.value)}
+               >
+               {type !== 'question' && 'post' && (
+                   <>
+               <option value="feature">Feature</option>
+               <option value="news">News</option>
+               </>)}
+               <option value="question">Question</option>
+      
+
+      </select>
+    </div>
+  </div>
+
+
+
+</div>
+</div>
+
+
+          <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+            <div className="col-span-6" >
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Title
+              </label>
+              <div className="mt-1 flex rounded-md shadow-sm border-gray-300 border p-2">
+                <input
+                    type="text"
+                    name="title"
+                    defaultValue={heading}
+                    onBlur={() => setHeadingFocused(false)}
+                    onFocus={() => setHeadingFocused(true)}
+                    onChange={(e) => setHeading(e.target.value)}
+                  className="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300"
                 />
+              </div>
+            </div>
 
-                <div className="GroupedInput">
-                <div className="GroupedInput-item">
-                    <h4>Link (optional)</h4>
-                    <Input
+            <div className="col-span-6">
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Link
+              </label>
+              <div className="mt-1 flex rounded-md shadow-sm border-gray-300 border p-2">
+                <input
+                type="text"
                     placeholder={!linkFocused ? "Link your users to a blog post or specific page" : ''}
                     defaultValue={post.link}
                     onFocus={() => setLinkFocused(true)}
                     onBlur={() => setLinkFocused(false)}
                     onChange={(e) => setLink(e.target.value)}
-                    />
-                    </div>
-                <div className="GroupedInput-item">
-                    <h4>Type</h4>
-                    <Select
-                    defaultValue={post.type}
-                    onChange={(e) => setType(e.target.value)}
-                    >
-                    {type !== 'question' && 'post' && (
-                        <>
-                    <option value="feature">Feature</option>
-                    <option value="news">News</option>
-                    </>)}
-                    <option value="question">Question</option>
-                    </Select>
-                </div>
-                </div>
-                {type !== 'question' &&
-                <>
-                <h4>Content (required)</h4>
-                <Textarea
-                placeholder={!textFocused ? "Add the main text in here" : ''}
-                defaultValue={post.text}
-                onBlur={() => setTextFocused(false)}
-                onFocus={() => setTextFocused(true)}
-                onChange={(e) => setText(e.target.value)}
+                  className="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300"
                 />
-                </>}
-                <div>
-                {type === 'question' && (
-                    <div>
-                    {questionStyle === 'singleSlider' && (<div>
-                        <h4>Question style</h4>
-                        <Select
-                        defaultValue={questionStyle || 'singleSlider'}
-                        onChange={(e) => setQuestionStyle(e.target.value)}
-                        >
-                        <option value="singleSlider">Slider</option>
-                        <option value="multipleChoice">Multiple choice</option>
-                        </Select>
-                    </div>)}
-                    <div className="OptionContainer">
-                        {questionStyle === 'singleSlider' ?
-                    ( <div key={questionStyle}>
-                        <h4>Min label</h4>
-                        <Input className="rangeLabels" defaultValue={(post.question && post.question.minLabel) || 'Min'}/>
-                        <h4>Max label</h4>
-                        <Input className="rangeLabels" defaultValue={(post.question && post.question.maxLabel) || 'Max'}/>
-                        </div>
-                    ) : (
-                        <div key={questionStyle}>
-                        <h4>Options (Max 4)</h4>
-                        {post.options.map(op => <Input defaultValue={(op.responses / op.score) || 0} className="options"/>)}
-                        </div>)}
-                        </div>
-                    </div>)}
-                    <Button onClick={() => {
-                        console.log(questionStyle)
-                       editPost({
-                        "title": heading,
-                        text,
-                        link,
-                        type,
-                        questionStyle,
-                        userId: user.user.id,
-                        options: Array.from(document.querySelectorAll('.options')).filter(op => op.value).map(op => op.value),
-                       });
-                       const router = useRouter()
-                       router.push('/dashboard');
-                    }}>{!isLoading ? 'Save' : 'Saving..'}</Button>
-                </div>
-                </div>
+              </div>
             </div>
-  </div>
+
+            <div className="col-span-6">
+              <label htmlFor="about" className="block text-sm font-medium text-gray-700">
+                Text
+              </label>
+              <div className="mt-1">
+                <textarea
+                rows={5}
+                    placeholder={!textFocused ? "Add the main text in here" : ''}
+                    defaultValue={post.text}
+                    onBlur={() => setTextFocused(false)}
+                    onFocus={() => setTextFocused(true)}
+                    onChange={(e) => setText(e.target.value)}
+                  className="shadow-sm p-4 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+                />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+
+
+      </div>
+
+      <div className="pt-5">
+        <div className="flex justify-end">
+          <button
+            type="button"
+            className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            onClick={() => {
+                console.log(questionStyle)
+               editPost({
+                title: heading,
+                text,
+                link,
+                type,
+                questionStyle,
+                userId: user.user.id,
+                options: Array.from(document.querySelectorAll('.options')).filter(op => op.value).map(op => op.value),
+               });
+               router.push('/dashboard');
+            }}
+            className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+    </div>
+
+                </div>
+
+            </div>
 );
 }
 
