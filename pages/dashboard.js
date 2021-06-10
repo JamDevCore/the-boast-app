@@ -82,7 +82,7 @@ body {
 
 export async function getServerSideProps(ctx) {
     const session = await getSession(ctx)
-    console.log(session)
+    console.log('session', session)
     if (!session) {
       ctx.res.writeHead(302, { Location: '/' })
       ctx.res.end()
@@ -93,7 +93,6 @@ export async function getServerSideProps(ctx) {
       .collection("posts")
       .find({ userId: ObjectId(session.user.id)})
       .toArray();
-    console.log(posts)
     return {
       props: {
         user: session,

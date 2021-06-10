@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import {Link } from 'next/link'
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import React, { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
@@ -12,8 +13,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-import styled from 'styled-components';
-const Navbar = ({ className, userId }) => (
+const Navbar = ({ userId }) => (
   <React.Fragment>
   <Disclosure as="nav" className="bg-indigo-600">
   {({ open }) => (
@@ -108,41 +108,4 @@ const Navbar = ({ className, userId }) => (
 </React.Fragment>
 )
 
-export default styled(Navbar)`
-    background: white;
-    display: flex;
-    flex-direction: row;
-    justify-content: center
-    width: 100%;
-    box-shadow: 0px 3px 10px rgba(0,0,0,0.2);
-    button {
-      margin: 0 0px;
-      font-family: canada-type-gibson;
-      font-weight: 500;
-      background: transparent;
-      border: none;
-      padding: 10px 20px;
-      cursor: pointer;
-      font-size: 16px;
-      width: 25%;
-    }
-    .navLink {
-    margin: 0 0px;
-    font-family: canada-type-gibson;
-    font-weight: 500;
-    background: transparent;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 16px;
-    width: 25%;
-    }
-    .active-button {
-      background: #e8f4f8;
-    }
-    @media(min-width: 480px) {
-      button {
-        min-width: 100px;
-      }
-    }
-`
+export default Navbar;

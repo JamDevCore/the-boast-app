@@ -5,6 +5,7 @@ import { connectToDatabase } from '../../utils/mongodb';
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import { ObjectId } from 'bson';
 import { useRouter } from 'next/router'
+import axios from 'axios';
 
 const Input = styled.input`
   width: 100%;
@@ -58,7 +59,7 @@ const apiKey = process.env.GATSBY_DOOPOLLAPI;
 
 const editPost = async(post) => {
     console.log(post)
-    await axios.put('/api/posts', { date: { post, status:'updatePost' }});
+    await axios.put('/api/posts', { post, status:'updatePost' });
 }
 
 const NewPost = ({ className , user, post }) => {
@@ -191,12 +192,13 @@ const NewPost = ({ className , user, post }) => {
             Cancel
           </button>
           <button
-            type="submit"
+            type="button"
             onClick={() => {
                 console.log(questionStyle)
                editPost({
                 title: heading,
                 text,
+                _id: post._id,
                 link,
                 type,
                 questionStyle,

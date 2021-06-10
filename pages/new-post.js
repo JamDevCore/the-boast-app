@@ -1,46 +1,13 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Navbar from '../components/navbar';
-import { useRouter } from 'next/router'
+import { Router, useRouter } from 'next/router'
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import axios from 'axios';
 import { unstable_renderSubtreeIntoContainer } from 'react-dom';
-
-const Input = styled.input`
-  width: 100%;
-  height: 40px;
-  border: 1px solid grey;
-  background: white;
-  margin: 0 auto 10px 0;
-  border-radius: 3px;
-  padding: 10px;
-  font-family: Quicksand;
-  box-sizing: border-box;
-`
-const Textarea = styled.textarea`
-  width: 100%;
-  height: 200px;
-  border: 1px solid grey;
-  background: white;
-  margin: 0 auto 10px 0;
-  border-radius: 3px;
-  padding: 10px;
-  font-family: Quicksand;
-  box-sizing: border-box;
-`
-
-const Select = styled.select`
-  min-width: 200px;
-  max-width: 310px;
-  height: 40px;
-  border: 1px solid grey;
-  background: white;
-  margin: 0 auto 10px 0;
-  border-radius: 3px;
-  padding: 10px 5px;
-  font-family: Quicksand;
-  box-sizing: border-box;
-`
+// import { XIcon } from '@heroicons/react';
+import { PlusIcon as PlusIconSolid, XIcon } from '@heroicons/react/solid';
+import { PlusIcon as PlusIconOutline } from '@heroicons/react/outline'
 
 const Button = styled.button`
   border: none;
@@ -63,8 +30,9 @@ const createNewPost = async(post) => {
 
 
 const NewPost = ({ className , user, post }) => {
-  const router = useRouter()
+  const router =  useRouter();
   const [heading, setHeading] = useState();
+  const [options, setOptions] = useState([{label: '', order: 0 } ])
   const [headingFocused, setHeadingFocused] = useState(false);
   const [link, setLink] = useState('');
   const [linkFocused, setLinkFocused] = useState(false);
@@ -75,10 +43,10 @@ const NewPost = ({ className , user, post }) => {
   const [questionStyle, setQuestionStyle] = useState();
   const [isLoading, setLoading] = useState(false);
   // Sending the post
- 
+
                    
   return(
-    <div className={className}>
+    <div>
         <div className="Container">
             <Navbar userId={user.user.id} />
 <div className="m-4 p-8 sm:w-full lg:w-2/3">
@@ -158,6 +126,8 @@ const NewPost = ({ className , user, post }) => {
           </div>
 
           <div className="col-span-6">
+            {type !== 'question' ? 
+            <React.Fragment>
             <label htmlFor="about" className="block text-sm font-medium text-gray-700">
               Text
             </label>
@@ -172,6 +142,38 @@ const NewPost = ({ className , user, post }) => {
                 className="shadow-sm p-4 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-md"
               />
             </div>
+            </React.Fragment> : 
+            <div key={options.length}>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              Options
+            </label>
+            {options.map((op, index) => (<div className="my-4 flex rounded-md shadow-sm border-gray-300 border p-2">
+              <input
+                  type="text"
+                  name="title"
+                  defaultValue={heading}
+                  onBlur={() => setHeadingFocused(false)}
+                  onFocus={() => setHeadingFocused(true)}
+                className="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300"
+              />
+              {index !== 0 && <button id={`${index}-cancel-button`} type="button" data-value={index} onClick={(e) => {
+                const target = document.getElementById(e.currentTarget.id)
+                const newOptions = options.filter(opt => {
+                return opt.order === parseInt(target.getAttribute('data-value'), 10)})
+                setOptions(newOptions)
+              }}><XIcon  className="h-5 w-5" aria-hidden="true"/></button>}
+            </div>))}
+            <button
+              type="button"
+              onClick={() => {
+                const newOptions = options.concat([ { label: '', order: options.length }]);
+                setOptions(newOptions)
+              }}
+              className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              <PlusIconSolid className="h-5 w-5" aria-hidden="true" />
+            </button>
+            </div>}
           </div>
 
         </div>
@@ -190,9 +192,8 @@ const NewPost = ({ className , user, post }) => {
           Cancel
         </button>
         <button
-          type="submit"
+          type="button"
           onClick={async () => {
-            console.log(questionStyle)
            await createNewPost({
              "title": heading,
              text,
@@ -202,8 +203,7 @@ const NewPost = ({ className , user, post }) => {
              userId: user.user.id,
              options: Array.from(document.querySelectorAll('.options')).filter(op => op.value).map(op => op.value),
             });
-            console.log('here')
-            router.replace('/dashboard');
+            router.push('/dashboard');
           }}
           className="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
@@ -219,23 +219,6 @@ const NewPost = ({ className , user, post }) => {
           </div>
 );
 }
-
-
-export async function getServerSideProps(ctx) {
-    const session = await getSession(ctx)
-    console.log('session', session)
-    if (!session) {
-      ctx.res.writeHead(302, { Location: '/' })
-      ctx.res.end()
-      return {}
-    }
-    return {
-      props: {
-        user: session,
-      },
-    }
-  }
-
 
 export default styled(NewPost)`
 .Container {
@@ -287,3 +270,21 @@ export default styled(NewPost)`
     }
     }
 `;
+
+
+export async function getServerSideProps(ctx) {
+    const session = await getSession(ctx)
+    console.log('session', session)
+    if (!session) {
+      ctx.res.writeHead(302, { Location: '/' })
+      ctx.res.end()
+      return {}
+    }
+    return {
+      props: {
+        user: session,
+      },
+    }
+  }
+
+

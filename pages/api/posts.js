@@ -9,11 +9,10 @@ const deletePost = async (post, db, res) => {
 
 export default async function handler(req, res) {
     const { body } = req;
-    console.log('yo', req.body)
     const { db  }= await connectToDatabase();
+    console.log('POST', req.body)
     if(req.method ==='DELETE') {
       const { post } = body;
-      console.log(post)
       if(post) {
         await deletePost(post, db, res);
       }
@@ -43,37 +42,41 @@ export default async function handler(req, res) {
             throw new Error('No data received');
         }
     } else if (req.method === 'PUT') {
-      const { post, option, status } = body;
+      const { post, option, status } = req.body;
+      console.log(post, option, status)
       if(status === 'updatePost') {
-        const oldPost = await db.collection('posts').findOne({ _id: ObjectId(post) })
+        const oldPost = await db.collection('posts').findOne({ _id: ObjectId(post._id) })
         const newPost = JSON.parse(JSON.stringify(oldPost));
+        console.log('oldPost', oldPost)
+        console.log('newPost', newPost)
+
         newPost.title = post.title
         newPost.text = post.text;
         newPost.link = post.link;
         newPost.type = post.type;
         newPost.questionStyle = post.questionStyle;
-        newPost.options = newPost.options.map(op => {
-          const newOP = JSON.parse(JSON.stringify(op));
-          const option = oldPost.options.filter(o => o._id === op._id)[0];
-          newOp.label = 
-          console.log(option)
-        })
-        options: Array.from
+        newPost.options = post.options;
+        // newPost.options = newPost.options.map(op => {
+        //   const newOP = JSON.parse(JSON.stringify(op));
+        //   const option = oldPost.options.filter(o => o._id === op._id)[0];
+        //   newOp.label = 
+        //   console.log(option)
+        // })
         await db.collection('posts')
         .updateOne({
-                _id: ObjectId(post)
+                _id: ObjectId(post._id)
             }, {
               $set: {
-                options: newOptions
+                options: newPost.options,
+                title: newPost.title,
+                text: newPost.text,
+                link: newPost.link,
+                type: newPost.type,
+                questionStyle: newPost.questionStyle,
               },
-              $inc: {
-                responses: 1,
-              }
             });
-            res.send('complete')
-      }
-
-      if(option) {
+         
+      } else if(option) {
         const oldPost = await db.collection('posts').findOne({ _id: ObjectId(post) })
         const newPost = JSON.parse(JSON.stringify(oldPost))
         const newOptions = oldPost.options.map(op => {
