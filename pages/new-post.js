@@ -32,7 +32,8 @@ const createNewPost = async(post) => {
 const NewPost = ({ className , user, post }) => {
   const router =  useRouter();
   const [heading, setHeading] = useState();
-  const [options, setOptions] = useState([{label: '', order: 0 } ])
+  const [options, setOptions] = useState({ option0: { label: ''} })
+  const[optionNumber, setOptionNumber] = useState(1)
   const [headingFocused, setHeadingFocused] = useState(false);
   const [link, setLink] = useState('');
   const [linkFocused, setLinkFocused] = useState(false);
@@ -43,7 +44,7 @@ const NewPost = ({ className , user, post }) => {
   const [questionStyle, setQuestionStyle] = useState();
   const [isLoading, setLoading] = useState(false);
   // Sending the post
-
+  console.log(options)
                    
   return(
     <div>
@@ -143,31 +144,42 @@ const NewPost = ({ className , user, post }) => {
               />
             </div>
             </React.Fragment> : 
-            <div key={options.length}>
+            <div key={optionNumber}>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
               Options
             </label>
-            {options.map((op, index) => (<div className="my-4 flex rounded-md shadow-sm border-gray-300 border p-2">
+            {Object.keys(options).map((op, index) => (<div className="my-4 flex rounded-md shadow-sm border-gray-300 border p-2">
               <input
                   type="text"
                   name="title"
-                  defaultValue={heading}
+                  data-value={index}
+                  defaultValue={options[op].label}
+                  onChange={(e) => {
+                      let currentOp = options;  
+                      const newOp = `option${e.target.getAttribute('data-value')}`
+                      currentOp[`option${e.target.getAttribute('data-value')}`].label = e.target.value
+                      setOptions(options)
+                  }}
                   onBlur={() => setHeadingFocused(false)}
                   onFocus={() => setHeadingFocused(true)}
                 className="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300"
               />
               {index !== 0 && <button id={`${index}-cancel-button`} type="button" data-value={index} onClick={(e) => {
                 const target = document.getElementById(e.currentTarget.id)
-                const newOptions = options.filter(opt => {
-                return opt.order === parseInt(target.getAttribute('data-value'), 10)})
+                const newOptions = options;
+                delete newOptions[`option${e.target.getAttribute('data-value')}`];
                 setOptions(newOptions)
+                setOptionNumber(Object.keys(newOptions).length)
               }}><XIcon  className="h-5 w-5" aria-hidden="true"/></button>}
             </div>))}
             <button
               type="button"
               onClick={() => {
-                const newOptions = options.concat([ { label: '', order: options.length }]);
+                const newOptions = options;
+                newOptions[`option${Object.keys(options).length}`] = { label : '' }
+                console.log(newOptions)
                 setOptions(newOptions)
+                setOptionNumber(Object.keys(newOptions).length)
               }}
               className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
@@ -201,7 +213,7 @@ const NewPost = ({ className , user, post }) => {
              type,
              questionStyle,
              userId: user.user.id,
-             options: Array.from(document.querySelectorAll('.options')).filter(op => op.value).map(op => op.value),
+             options: Object.keys(options).map(op => options[op].label),
             });
             router.push('/dashboard');
           }}
