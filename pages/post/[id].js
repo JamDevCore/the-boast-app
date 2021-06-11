@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Navbar from '../../components/navbar';
 import { connectToDatabase } from '../../utils/mongodb';
@@ -6,55 +6,9 @@ import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import { ObjectId } from 'bson';
 import { useRouter } from 'next/router'
 import axios from 'axios';
+import { PlusIcon as PlusIconSolid, XIcon } from '@heroicons/react/solid';
+import { PlusIcon as PlusIconOutline } from '@heroicons/react/outline'
 
-const Input = styled.input`
-  width: 100%;
-  height: 40px;
-  border: 1px solid grey;
-  background: white;
-  margin: 0 auto 10px 0;
-  border-radius: 3px;
-  padding: 10px;
-  font-family: Quicksand;
-  box-sizing: border-box;
-`
-const Textarea = styled.textarea`
-  width: 100%;
-  height: 200px;
-  border: 1px solid grey;
-  background: white;
-  margin: 0 auto 10px 0;
-  border-radius: 3px;
-  padding: 10px;
-  font-family: Quicksand;
-  box-sizing: border-box;
-`
-
-const Select = styled.select`
-  min-width: 200px;
-  max-width: 310px;
-  height: 40px;
-  border: 1px solid grey;
-  background: white;
-  margin: 0 auto 10px 0;
-  border-radius: 3px;
-  padding: 10px 5px;
-  font-family: Quicksand;
-  box-sizing: border-box;
-`
-
-const Button = styled.button`
-  border: none;
-  background-color:#4bb543;
-  padding: 5px 10px;
-  font-family: Quicksand;
-  border-radius: 6px;
-  min-width: 120px;
-  max-width: 300px;
-  color: white;
-  margin-top: 30px;
-  box-sizing: border-box;
-`
 const apiKey = process.env.GATSBY_DOOPOLLAPI;
 
 const editPost = async(post) => {
@@ -74,8 +28,18 @@ const NewPost = ({ className , user, post }) => {
   const [questionFocused, setQuestionFocused] = useState(false);
   const [questionStyle, setQuestionStyle] = useState(post.questionStyle);
   const [isLoading, setLoading] = useState(false);
+  const [options, setOptions] = useState({})
+  const [optionNumber, setOptionNumber] = useState(post.options.length);
   // Sending the post
-
+  useEffect(() => {
+    const opObject = {};
+    post.options.forEach((op,index) => {
+      opObject[`option${index}`] = {label: op.label, _id: op._id };
+    });
+    setOptions(opObject)
+  }, [optionNumber])
+  console.log(optionNumber)
+  console.log(options);
   return(
       <div className={className}>
           <div className="Container">
@@ -159,22 +123,66 @@ const NewPost = ({ className , user, post }) => {
               </div>
             </div>
 
-            <div className="col-span-6">
-              <label htmlFor="about" className="block text-sm font-medium text-gray-700">
-                Text
-              </label>
-              <div className="mt-1">
-                <textarea
-                rows={5}
-                    placeholder={!textFocused ? "Add the main text in here" : ''}
-                    defaultValue={post.text}
-                    onBlur={() => setTextFocused(false)}
-                    onFocus={() => setTextFocused(true)}
-                    onChange={(e) => setText(e.target.value)}
-                  className="shadow-sm p-4 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-md"
-                />
-              </div>
+            {type !== 'question' ? 
+            <div className="flex flex-col col-span-6">
+            <label htmlFor="about" className="block text-sm font-medium text-gray-700">
+              Text
+            </label>
+            <div className="mt-1">
+              <textarea
+              rows={5}
+                  placeholder={!textFocused ? "Add the main text in here" : ''}
+                  defaultValue={""}
+                  onBlur={() => setTextFocused(false)}
+                  onFocus={() => setTextFocused(true)}
+                  onChange={(e) => setText(e.target.value)}
+                className="shadow-sm p-4 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-md"
+              />
             </div>
+            </div> : 
+            <div className="col-span-6" key={optionNumber}>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              Options
+            </label>
+            {Object.keys(options).map((op, index) => (<div className="my-4 flex rounded-md shadow-sm border-gray-300 border p-2">
+              <input
+                  type="text"
+                  name="title"
+                  data-value={index}
+                  defaultValue={options[op].label}
+                  onChange={(e) => {
+                      let currentOp = options;  
+                      const newOp = `option${e.target.getAttribute('data-value')}`
+                      currentOp[`option${e.target.getAttribute('data-value')}`].label = e.target.value
+                      setOptions(options)
+                  }}
+                  onBlur={() => setHeadingFocused(false)}
+                  onFocus={() => setHeadingFocused(true)}
+                className="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300"
+              />
+              {index !== 0 && <button id={`${index}-cancel-button`} type="button" data-value={index} onClick={(e) => {
+                const target = document.getElementById(e.currentTarget.id)
+                const newOptions = options;
+                delete newOptions[`option${e.target.getAttribute('data-value')}`];
+                console.log(newOptions);
+                setOptions(newOptions)
+                setOptionNumber(Object.keys(newOptions).length)
+              }}><XIcon  className="h-5 w-5" aria-hidden="true"/></button>}
+            </div>))}
+            <button
+              type="button"
+              onClick={() => {
+                const newOptions = options;
+                newOptions[`option${Object.keys(options).length}`] = { label : '' }
+                console.log(newOptions)
+                setOptions(newOptions)
+                setOptionNumber(Object.keys(newOptions).length)
+              }}
+              className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              <PlusIconSolid className="h-5 w-5" aria-hidden="true" />
+            </button>
+            </div>}
 
           </div>
         </div>
@@ -194,7 +202,6 @@ const NewPost = ({ className , user, post }) => {
           <button
             type="button"
             onClick={() => {
-                console.log(questionStyle)
                editPost({
                 title: heading,
                 text,
@@ -203,7 +210,7 @@ const NewPost = ({ className , user, post }) => {
                 type,
                 questionStyle,
                 userId: user.user.id,
-                options: Array.from(document.querySelectorAll('.options')).filter(op => op.value).map(op => op.value),
+                options: Object.keys(options).map(op => options[op]),
                });
                router.push('/dashboard');
             }}
@@ -244,52 +251,5 @@ export async function getServerSideProps(ctx) {
 
 
 export default styled(NewPost)`
-.Container {
-    margin: 0 auto;
-}
-    width: 100%;
-    height: 100%;
-    .NewPost{
-    display: flex;
-    flex-direction: column;
-    max-width: 800px;
-    background:white;
-    padding: 20px;
-    margin-top: 20px;
-    box-shadow: 0px 3px 15px rgba(0,0,0,0.2);
-    margin-bottom: 50px;
-    h4 {
-        margin: 20px 0 10px 0;
-    }
-    .GroupedInput {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    .GroupedInput-item {
-        display:flex;
-        flex-direction: column;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    @media(min-width: 480px) {
-        .GroupedInput {
-        display: flex;
-        flex-direction: row;
-        }
-        .GroupedInput-item {
-        display:flex;
-        flex-direction: column;
-        width: 50%;
-        margin: 0 20px 0 0;
-        }
-    }
-    .option {
-        margin: 0 0 20px 0;
-    }
-    .OptionContainer {
-        margin-top: 30px;
-    }
-    }
+
 `;

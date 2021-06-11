@@ -42,7 +42,7 @@ const Snippet = ({ user, className }) => {
   }
   return (
     <div className={className}>
-      <Navbar />
+      <Navbar  userId={user.user.id} />
     <div className="w-2/3 m-4 bg-white shadow overflow-hidden sm:rounded-lg">
       <div className="px-4 py-5 sm:px-6">
         <h3 className="text-lg leading-6 font-medium text-gray-900">Including Boast in your site</h3>

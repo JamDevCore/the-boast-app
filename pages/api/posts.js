@@ -42,8 +42,8 @@ export default async function handler(req, res) {
             throw new Error('No data received');
         }
     } else if (req.method === 'PUT') {
-      const { post, option, status } = req.body;
-      console.log(post, option, status)
+      const { post, option, options, status } = req.body;
+      console.log('hello', post.options, options, status)
       if(status === 'updatePost') {
         const oldPost = await db.collection('posts').findOne({ _id: ObjectId(post._id) })
         const newPost = JSON.parse(JSON.stringify(oldPost));
@@ -55,13 +55,24 @@ export default async function handler(req, res) {
         newPost.link = post.link;
         newPost.type = post.type;
         newPost.questionStyle = post.questionStyle;
-        newPost.options = post.options;
-        // newPost.options = newPost.options.map(op => {
-        //   const newOP = JSON.parse(JSON.stringify(op));
-        //   const option = oldPost.options.filter(o => o._id === op._id)[0];
-        //   newOp.label = 
-        //   console.log(option)
-        // })
+        newPost.options = post.options.map(op => {
+
+          const newOP = JSON.parse(JSON.stringify(op));
+          console.log(newOP)
+          if(!newOP._id) {
+            console.log('yere')
+            newOP._id = new ObjectId();
+            return newOP
+
+          };
+          console.log('hbre');
+          const oldOP = oldPost.options.filter(o => o._id.toString() === op._id)[0];
+          console.log(oldOP)
+          newOP.score = oldOP.score;
+          newOP.responses = oldOP.responses;
+          newOP._id = ObjectId(oldOP._id);
+          return newOP;
+        })
         await db.collection('posts')
         .updateOne({
                 _id: ObjectId(post._id)

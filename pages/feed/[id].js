@@ -15,6 +15,11 @@ import {
   UsersIcon,
   CogIcon,
   QuestionMarkCircleIcon
+} from '@heroicons/react/solid'
+
+import {
+
+  HeartIcon as HeartIconO,
 } from '@heroicons/react/outline'
 import axios from 'axios';
 
@@ -42,43 +47,42 @@ const icons = {
 
 
 
-const Question = (post) => {
+const Question = ({ post, setIsAnswered,  isAnswered }) => {
     console.log(post)
     return(
-        <div className="my-5 flex flex-col">
-            {post.post.options.map(op => {
+        <div className="my-5 flex flex-col focus:outline-none active:outline-none">
+            {!isAnswered ? post.options.map(op => {
                 return  <button
                 type="button"
-                onClick={() => submitResponse(op._id, post.post._id)}
-                className="cursor-pointer inline-flex max-w-md flex justify-center my-2 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                onClick={() => {
+                  setIsAnswered(true)
+                  submitResponse(op._id, post._id)
+                }}
+                className="active:focus:outline-none focus:outline-none cursor-pointer inline-flex max-w-md flex justify-center my-2 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-non"
               >
                 {op.label}
               </button>
-            })}
+            }) : <div><p>Thanks, your response has been submitted</p></div>}
         </div>
     );
 }
 
 
-const Feed = ({ className , user, posts }) => {
-  // Sending the post
-    console.log(posts)
-  return(  
-      <div className={className}>
-    <header className="p-4  border-b-2 bg-indigo-600 text-white">What's new</header>
-    <div className="rounded-lg bg-gray-200 overflow-hidden shadow divide-y divide-gray-200">
-      {posts.map((post, actionIdx) => (
-        <div
+const Post = ({ post, actionIdx, posts }) => {
+  const [isLiked, setIsLiked] = useState(false);
+  const [isAnswered, setIsAnswered] = useState(false);
+  return (
+<div
           key={post.title}
           className={classNames(
             actionIdx === 0 ? 'rounded-tl-lg rounded-tr-lg sm:rounded-tr-none' : '',
             actionIdx === 1 ? 'sm:rounded-tr-lg' : '',
             actionIdx === posts.length - 2 ? 'sm:rounded-bl-lg' : '',
             actionIdx === posts.length - 1 ? 'rounded-bl-lg rounded-br-lg sm:rounded-bl-none' : '',
-            'relative group bg-white p-6 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500'
+            'relative group bg-white p-6 focus:outline-none'
           )}
         >
-          <div>
+          <div className="focus:outline-none">
             <span
               className={classNames(
                 'text-teal-700 bg-teal-50',
@@ -95,8 +99,13 @@ const Feed = ({ className , user, posts }) => {
             </h3>
             {post.type !== 'question' ? <p className="mt-2 text-sm text-gray-500">
               {post.text}
-            </p> : <div><Question post={post}/></div>}
-            <button onClick={() => likePost(post._id)}className="border-0 bg-white"><HeartIcon className="mt-5 h-6"/></button>
+            </p> : <div classname="focus:outline-none"><Question post={post} setIsAnswered={setIsAnswered} isAnswered={isAnswered} /></div>}
+            <button onClick={() => {
+              if(!isLiked) {
+              setIsLiked(true)
+              likePost(post._id)
+              }
+            }}className="focus:outline-none border-0 bg-white">{isLiked ? <HeartIcon className="outline-none mt-5 h-6 text-red-500"/> : <HeartIconO className="outline-none mt-5 h-6 text-red-500"/>}</button>
           </div>
             <a href={post.link} className="focus:outline-none cursor-pointer">
           <span
@@ -110,7 +119,17 @@ const Feed = ({ className , user, posts }) => {
           </span>
           </a>
         </div>
-      ))}
+  )
+}
+
+const Feed = ({ className , user, posts }) => {
+  // Sending the post
+    console.log(posts)
+  return(  
+      <div className={className}>
+    <header className="p-4  border-b-2 bg-indigo-600 text-white">What's new</header>
+    <div className="rounded-lg focus:outline-none bg-gray-200 overflow-hidden shadow divide-y divide-gray-200">
+      {posts.map((post, actionIdx) => (<Post post={post} actionIdx={actionIdx} posts={posts} />))}
     </div>
 
   </div>
