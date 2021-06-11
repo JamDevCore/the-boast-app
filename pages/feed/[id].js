@@ -107,7 +107,7 @@ const Post = ({ post, actionIdx, posts }) => {
               }
             }}className="focus:outline-none border-0 bg-white">{isLiked ? <HeartIcon className="outline-none mt-5 h-6 text-red-500"/> : <HeartIconO className="outline-none mt-5 h-6 text-red-500"/>}</button>
           </div>
-            <a href={post.link} className="focus:outline-none cursor-pointer">
+            <a target="_blank" href={post.link} className="focus:outline-none cursor-pointer">
           <span
             className="absolute top-6 right-6 text-gray-300 group-hover:text-gray-400"
             aria-hidden="true"
@@ -127,8 +127,8 @@ const Feed = ({ className , user, posts }) => {
     console.log(posts)
   return(  
       <div className={className}>
-    <header className="p-4  border-b-2 bg-indigo-600 text-white">What's new</header>
-    <div className="rounded-lg focus:outline-none bg-gray-200 overflow-hidden shadow divide-y divide-gray-200">
+    <header className="p-4 border-b-2 bg-indigo-600 text-white">What's new</header>
+    <div className="focus:outline-none bg-gray-200 overflow-scroll shadow divide-y divide-gray-200">
       {posts.map((post, actionIdx) => (<Post post={post} actionIdx={actionIdx} posts={posts} />))}
     </div>
 
@@ -150,4 +150,7 @@ export async function getServerSideProps(ctx) {
   }
 
 
-export default Feed
+export default styled(Feed)`
+height: 100vh;
+background: white;
+`
