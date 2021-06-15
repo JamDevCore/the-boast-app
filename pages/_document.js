@@ -38,7 +38,7 @@ return (
 <Html lang="en">
 <Head>
 <script>{console.log('heello')}</script>
-<script async data-userId="60a2747d4652a216c309d08e" data-defaultButton="false" data-buttonText="What's new" src="https://unpkg.com/boast-init@0.1.5/umd/boast-init.min.js"></script>
+<script async data-userId="60a2747d4652a216c309d08e" data-defaultButton="false" data-buttonText="What's new" src="https://unpkg.com/boast-init@latest/umd/boast-init.min.js"></script>
 </Head>
 <body>
 <Main>
