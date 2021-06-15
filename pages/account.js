@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import axios from 'axios';
 import Link from 'next/link'
-import Navbar from '../components/navbar';
+import Navbar from '../components/navbar.js';
 import Image from 'next/image'
 import { connectToDatabase } from "../utils/mongodb";
 // import NewPost from './new-post';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Navbar from '../components/navbar';
+import Navbar from '../components/navbar.js';
 import { Router, useRouter } from 'next/router'
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import axios from 'axios';

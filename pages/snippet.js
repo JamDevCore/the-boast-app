@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import styled from 'styled-components';
-import Navbar from '../components/navbar';
+import Navbar from '../components/navbar.js';
 import { Switch } from '@headlessui/react'
 
 const Input = styled.input`
