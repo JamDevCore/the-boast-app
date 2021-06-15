@@ -3,9 +3,12 @@ import {Link } from 'next/link'
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import React, { Fragment } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
+import Head from "next/head";
+
+
 import { BellIcon, MenuIcon, TemplateIcon, XIcon } from '@heroicons/react/outline'
 
-const navigation = [{ label: 'Dashboard', page: '/' }, { label: 'Create a post', page: 'new-post' },  { label: 'Embed', page: '/snippet' }, { label: 'Preview', page: '', isPreview: true }]
+const navigation = [{ label: 'Dashboard', page: '/' }, { label: 'Create a post', page: '/new-post' },  { label: 'Embed', page: '/snippet' }, { label: 'Preview', page: '', isPreview: true }, { label: 'Account', page: '/account'}]
 const profile = ['Your Profile', 'Settings', 'Sign out']
 
 
@@ -13,8 +16,11 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-const Navbar = ({ userId }) => (
-  <React.Fragment>
+const Navbar = ({ userId }) => {
+  // useEffect(() => {
+ 
+  // })
+  return (<React.Fragment>
   <Disclosure as="nav" className="bg-indigo-600">
   {({ open }) => (
     <>
@@ -105,7 +111,7 @@ const Navbar = ({ userId }) => (
     </>
   )}
 </Disclosure>
-</React.Fragment>
-)
+</React.Fragment>)
+}
 
 export default Navbar;

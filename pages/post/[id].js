@@ -30,16 +30,17 @@ const NewPost = ({ className , user, post }) => {
   const [isLoading, setLoading] = useState(false);
   const [options, setOptions] = useState({})
   const [optionNumber, setOptionNumber] = useState(post.options.length);
-  // Sending the post
   useEffect(() => {
     const opObject = {};
     post.options.forEach((op,index) => {
       opObject[`option${index}`] = {label: op.label, _id: op._id };
     });
     setOptions(opObject)
+  }, [])
+  // Sending the post
+  useEffect(() => {
+
   }, [optionNumber])
-  console.log(optionNumber)
-  console.log(options);
   return(
       <div className={className}>
           <div className="Container">
@@ -140,7 +141,7 @@ const NewPost = ({ className , user, post }) => {
               />
             </div>
             </div> : 
-            <div className="col-span-6" key={optionNumber}>
+            <div className="col-span-6">
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">
               Options
             </label>
@@ -164,19 +165,19 @@ const NewPost = ({ className , user, post }) => {
                 const target = document.getElementById(e.currentTarget.id)
                 const newOptions = options;
                 delete newOptions[`option${e.target.getAttribute('data-value')}`];
-                console.log(newOptions);
                 setOptions(newOptions)
                 setOptionNumber(Object.keys(newOptions).length)
               }}><XIcon  className="h-5 w-5" aria-hidden="true"/></button>}
             </div>))}
             <button
               type="button"
-              onClick={() => {
-                const newOptions = options;
+              onClick={async () => {
+                const newOptions = JSON.parse(JSON.stringify(options));
+                console.log(newOptions, Object.keys(newOptions).length)
                 newOptions[`option${Object.keys(options).length}`] = { label : '' }
-                console.log(newOptions)
-                setOptions(newOptions)
-                setOptionNumber(Object.keys(newOptions).length)
+                console.log(newOptions, newOptions.length)
+                await setOptions(newOptions);
+                await setOptionNumber(Object.keys(newOptions).length)
               }}
               className="inline-flex items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
