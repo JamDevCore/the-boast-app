@@ -21,14 +21,14 @@ enhanceComponent: (Component) => Component,
 // Run the parent `getInitialProps`, it now includes the custom `renderPage`
 const initialProps = await Document.getInitialProps(ctx);
 return {
-...initialProps,
-styles: (
-<>
-{initialProps.styles}
-{sheet.getStyleElement()}
-</>
-),
-};
+        ...initialProps,
+        styles: (
+        <>
+        {initialProps.styles}
+        {sheet.getStyleElement()}
+        </>
+        ),
+    };
 } finally {
 sheet.seal();
 }
@@ -36,9 +36,14 @@ sheet.seal();
 render() {
 return (
 <Html lang="en">
-<Head />
+<Head>
+<script>{console.log('heello')}</script>
+<script async data-userId="60a2747d4652a216c309d08e" data-defaultButton="false" data-buttonText="What's new" src="https://unpkg.com/boast-init@0.1.5/umd/boast-init.min.js"></script>
+</Head>
 <body>
-<Main />
+<Main>
+
+</Main>
 <NextScript />
 </body>
 </Html>

@@ -1,10 +1,9 @@
 import Image from 'next/image';
 import {Link } from 'next/link'
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
-import React, { Fragment } from 'react'
+import React, { Fragment, useEffect } from 'react'
 import { Disclosure, Menu, Transition } from '@headlessui/react'
 import Head from "next/head";
-
 
 import { BellIcon, MenuIcon, TemplateIcon, XIcon } from '@heroicons/react/outline'
 
@@ -17,9 +16,6 @@ function classNames(...classes) {
 }
 
 const Navbar = ({ userId }) => {
-  // useEffect(() => {
- 
-  // })
   return (<React.Fragment>
   <Disclosure as="nav" className="bg-indigo-600">
   {({ open }) => (
@@ -36,24 +32,25 @@ const Navbar = ({ userId }) => {
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-4">
-                {navigation.map((item, itemIdx) =>
-                  itemIdx === 0 ? (
-                    <Fragment key={item.label}>
-                      {/* Current: "bg-indigo-700 text-white", Default: "text-white hover:bg-indigo-500 hover:bg-opacity-75" */}
-                      <a href={item.page} className="bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium">
+                {navigation.map((item, itemIdx) => {
+                    return itemIdx === 0 ? (
+                      <Fragment key={item.label}>
+                        {/* Current: "bg-indigo-700 text-white", Default: "text-white hover:bg-indigo-500 hover:bg-opacity-75" */}
+                        <a href={item.page} className="bg-indigo-700 text-white px-3 py-2 rounded-md text-sm font-medium">
+                          {item.label}
+                        </a>
+                      </Fragment>
+                    ) : (
+                      <a
+                        key={item.page}
+                        href={item.isPreview ? `/feed/${userId}` : item.page}
+                        className="text-white hover:bg-indigo-500 hover:bg-opacity-75 px-3 py-2 rounded-md text-sm font-medium"
+                      >
                         {item.label}
                       </a>
-                    </Fragment>
-                  ) : (
-                    <a
-                      key={item.page}
-                      href={item.isPreview ? `/feed/${userId}` : item.page}
-                      className="text-white hover:bg-indigo-500 hover:bg-opacity-75 px-3 py-2 rounded-md text-sm font-medium"
-                    >
-                      {item.label}
-                    </a>
-                  )
-                )}
+                    )
+                }
+                  )}
               </div>
             </div>
           </div>
