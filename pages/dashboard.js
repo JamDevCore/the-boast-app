@@ -2,7 +2,7 @@ import React from "react";
 import styled from 'styled-components';
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import Link from 'next/link'
-import Navbar from '../components/navba.js';
+import Navbar from '../components/navbar.js';
 import Image from 'next/image'
 import { connectToDatabase } from "../utils/mongodb";
 // import NewPost from './new-post';
