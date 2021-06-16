@@ -44,12 +44,10 @@ class MyDocument extends Document {
         }
     }
     render(props) {
-        console.log('myprops', MyDocument.getSession)
         return (
             <Html lang="en">
                 <Head>
-                <script>{console.log('heello')}</script>
-                {MyDocument.getSession.user.id && MyDocument.getPath !== '/feed/[id]' && <script async data-userId={MyDocument.getSession.user.id} data-defaultButton="false" data-buttonText="What's new" src="https://unpkg.com/boast-init@latest/umd/boast-init.min.js"></script>}
+                {MyDocument.getSession && MyDocument.getSession.user &&  MyDocument.getSession.user.id && MyDocument.getPath !== '/feed/[id]' && <script async data-userId={MyDocument.getSession.user.id} data-defaultButton="false" data-buttonText="What's new" src="https://unpkg.com/boast-init@latest/umd/boast-init.min.js"></script>}
                 </Head>
                 <body>
                 <Main>
