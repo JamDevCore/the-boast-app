@@ -8,8 +8,8 @@ import { ObjectId } from 'bson';
 import {
   AcademicCapIcon,
   BadgeCheckIcon,
-  CashIcon,
-  ClockIcon,
+  SpeakerphoneIcon,
+  LightBulbIcon,
   HeartIcon,
   ReceiptRefundIcon,
   UsersIcon,
@@ -26,8 +26,8 @@ import axios from 'axios';
      
 const icons = {
     question: () => <QuestionMarkCircleIcon className="w-6"/>,
-    feature: () => <CogIcon className="w-6"/>,
-    news: () => <AcademicCapIcon className="w-6" />,
+    feature: () => <LightBulbIcon className="w-6"/>,
+    news: () => <SpeakerphoneIcon className="w-6" />,
 
 }
 
@@ -97,27 +97,29 @@ const Post = ({ post, actionIdx, posts }) => {
                 {/* Extend touch target to entire panel */}
                 {post.title}
             </h3>
-            {post.type !== 'question' ? <p className="mt-2 text-sm text-gray-500">
+            {post.type !== 'question' ? <p className="my-2 text-sm text-gray-500">
               {post.text}
             </p> : <div classname="focus:outline-none"><Question post={post} setIsAnswered={setIsAnswered} isAnswered={isAnswered} /></div>}
-            <button onClick={() => {
-              if(!isLiked) {
-              setIsLiked(true)
-              likePost(post._id)
-              }
-            }}className="focus:outline-none border-0 bg-white">{isLiked ? <HeartIcon className="outline-none mt-5 h-6 text-red-500"/> : <HeartIconO className="outline-none mt-5 h-6 text-red-500"/>}</button>
+          
           </div>
-            <a target="_blank" href={post.link} className="focus:outline-none cursor-pointer">
+            {post.link && <a target="_blank" href={post.link} className="focus:outline-none cursor-pointer">
           <span
             className="absolute top-6 right-6 text-gray-300 group-hover:text-gray-400"
             aria-hidden="true"
           >
-            <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
               <path d="M20 4h1a1 1 0 00-1-1v1zm-1 12a1 1 0 102 0h-2zM8 3a1 1 0 000 2V3zM3.293 19.293a1 1 0 101.414 1.414l-1.414-1.414zM19 4v12h2V4h-2zm1-1H8v2h12V3zm-.707.293l-16 16 1.414 1.414 16-16-1.414-1.414z" />
             </svg>
             
           </span>
-          </a>
+          </a>}
+          {post.link && <a target="_blank" href={post.link} className="focus:outline-none text-indigo-500 underline text-sm cursor-pointer">Read more</a>}
+          <button onClick={() => {
+              if(!isLiked) {
+              setIsLiked(true)
+              likePost(post._id)
+              }
+            }} className="block ml-auto mr-0 focus:outline-none border-0 bg-white">{isLiked ? <HeartIcon className="outline-none mt-2 h-6 text-red-500"/> : <HeartIconO className="outline-none mt-2 h-6 text-red-500"/>}</button>
         </div>
   )
 }
