@@ -4,13 +4,13 @@ const { mongodburl } = process.env
 
 const MONGODB_DB = 'Boast-Core';
 
-if (!mongodburl) {
+if (!MONGODBURL) {
   throw new Error(
     'Please define the MONGODB_URI environment variable inside .env.local'
   )
 }
 
-if (!mongodburl) {
+if (!MONGODBURL) {
   throw new Error(
     'Please define the MONGODB_DB environment variable inside .env.local'
   )
@@ -38,7 +38,7 @@ export async function connectToDatabase() {
       useUnifiedTopology: true,
     }
 
-    cached.promise = MongoClient.connect(mongodburl, opts).then((client) => {
+    cached.promise = MongoClient.connect(MONGODBURL, opts).then((client) => {
       return {
         client,
         db: client.db(MONGODB_DB),

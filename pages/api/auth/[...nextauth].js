@@ -17,7 +17,7 @@ export default NextAuth({
   ],
 
   // A database is optional, but required to persist accounts in a database
-  database: process.env.mongodburl, 
+  database: process.env.MONGODBURL, 
   session: {
     jwt: true,
     maxAge: 30 * 24 * 60 * 60 // 30 days
