@@ -6,12 +6,12 @@ export default NextAuth({
   providers: [
     Providers.Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET
-
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorizationUrl: process.env.NEXTAUTH_URL
     }),
     Providers.Email({
         server: process.env.EMAIL_SERVER,
-        authorizationUrl: process.env.NEXTAUTH_URL
+        from: process.env.EMAIL_FROM
         // maxAge: 24 * 60 * 60, // How long email links are valid for (default 24h)
       }),
     // ...add more providers here
