@@ -8,10 +8,10 @@ class MyDocument extends Document {
     static async getInitialProps(ctx) {
         const sheet = new ServerStyleSheet();
         const originalRenderPage = ctx.renderPage;
-        const session = await getSession(ctx);
-        const path = ctx.pathname
-        MyDocument.getPath = path;
-        MyDocument.getSession = await getSession(ctx);
+        // const session = await getSession(ctx);
+        // const path = ctx.pathname
+        // MyDocument.getPath = path;
+        // MyDocument.getSession = await getSession(ctx);
         try {
             ctx.renderPage = () =>
                 originalRenderPage({
@@ -47,7 +47,7 @@ class MyDocument extends Document {
         return (
             <Html lang="en">
                 <Head>
-                {MyDocument.getSession && MyDocument.getSession.user &&  MyDocument.getSession.user.id && MyDocument.getPath !== '/feed/[id]' && <script async data-userId={MyDocument.getSession.user.id} data-defaultButton="false" data-buttonText="What's new" src="https://unpkg.com/boast-init@latest/umd/boast-init.min.js"></script>}
+                {/* {MyDocument.getSession && MyDocument.getSession.user &&  MyDocument.getSession.user.id && MyDocument.getPath !== '/feed/[id]' && <script async data-userId={MyDocument.getSession.user.id} data-defaultButton="false" data-buttonText="What's new" src="https://unpkg.com/boast-init@latest/umd/boast-init.min.js"></script>} */}
                 </Head>
                 <body>
                 <Main>
