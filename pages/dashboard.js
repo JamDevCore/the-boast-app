@@ -19,7 +19,6 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
-
 // const Menu = styled.div`
 //   max-width: 250px;
 // `
