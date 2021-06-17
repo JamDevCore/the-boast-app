@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb'
 const ObjectId = require('mongodb').ObjectId;
-const { mongodburl } = process.env
+const { MONGODBURL } = process.env
 
 const MONGODB_DB = 'Boast-Core';
 
