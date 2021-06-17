@@ -2,15 +2,17 @@ import NextAuth from 'next-auth'
 import Providers from 'next-auth/providers'
 
 export default NextAuth({
+  authorizationUrl: process.env.NEXTAUTH_URL,
   // Configure one or more authentication providers
   providers: [
     Providers.Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+
     }),
     Providers.Email({
         server: process.env.EMAIL_SERVER,
-        from: process.env.EMAIL_FROM,
+        authorizationUrl: process.env.NEXTAUTH_URL
         // maxAge: 24 * 60 * 60, // How long email links are valid for (default 24h)
       }),
     // ...add more providers here
@@ -20,7 +22,7 @@ export default NextAuth({
   database: process.env.MONGODBURL, 
   session: {
     jwt: true,
-    maxAge: 30 * 24 * 60 * 60 // 30 days
+    maxAge: 30 * 24 * 60 * 60
   },
   callbacks: {
     redirect: async (url, _) => {
@@ -30,10 +32,7 @@ export default NextAuth({
       return Promise.resolve('/api/auth/signin')
     },
     session: async (session, user, sessionToken) => {
-        console.log('user', user)
         session.user.id = user.sub;
-        console.log(session)
         return Promise.resolve(session, user, sessionToken)
     }}
-    
 });
