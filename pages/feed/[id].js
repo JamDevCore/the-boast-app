@@ -126,15 +126,19 @@ const Post = ({ post, actionIdx, posts }) => {
 }
 
 const Feed = ({ className , user, posts, isTrial }) => {
+  console.log('eeeeee', isTrial)
   const [isIframe, setIsIframe] = useState(false);
   const [isTrialling, setIsTrialling] = useState(false)
   useEffect(() => {
     if(typeof window !== 'undefined') {
-      if (window.location !== window.parent.location ) {
-        setIsTrialling(!isTrial);
+      console.log('here')
+      console.log(window.location, window.parent.location)
+      if (window.location.host !== window.parent.location.host) {
+
+        setIsTrialling(isTrial);
       }
     }
-  }, []);
+  });
   // Sending the post
     console.log(posts)
   return(  
@@ -162,6 +166,7 @@ export async function getServerSideProps(ctx) {
     console.log('hello', await user);
 
       const post = await db.collection('posts').find({ userId: ObjectId(ctx.query.id)})
+      console.log(user)
       const isTrial = user.vouchers && user.vouchers.length > 0 ? false : true;
       console.log(await post.toArray())
       return {
