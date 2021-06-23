@@ -167,7 +167,6 @@ export async function getServerSideProps(ctx) {
   }
   return {
     props: {
-      posts: JSON.parse(JSON.stringify(await post.toArray())),
       isTrial: true,
     },
   }
