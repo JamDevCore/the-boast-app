@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     if(req.method ==='GET') {
         const userId = body.userId
         console.log(userId)
-        const account = await db.collection('accounts').findOne({ userId: ObjectId(userId )});
+        const account = await db.collection('users').findOne({ _id: ObjectId(userId )});
         const vouchers = await db.collection('vouchers').find({ userId: userId.toString()  })
         console.log('vouchers', vouchers)
         res.send(vouchers)
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
                 if(existingVoucher.isRedeemed) {
                     throw new Error('is redeemed')
                 }
-                await db.collection('accounts').updateOne({ userId: ObjectId(userId )}, {
+        await db.collection('users').updateOne({ _id: ObjectId(userId )}, {
                     $addToSet: {
                         vouchers: voucher,
                     }

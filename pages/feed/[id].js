@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Navbar from '../../components/navbar';
 import { useRouter } from 'next/router'
@@ -68,9 +68,18 @@ const Question = ({ post, setIsAnswered,  isAnswered }) => {
 }
 
 
-const Post = ({ post, actionIdx, posts }) => {
+const Post = ({ post, actionIdx, posts, isTrial }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isAnswered, setIsAnswered] = useState(false);
+  const [isIframe, setIsIframe] = useState(false);
+  const [isTrialling, setIsTrialling] = useState(false)
+  useEffect(() => {
+    if(typeof window !== 'undefined') {
+      if (window.location !== window.parent.location ) {
+        setIsTrialling(isTrial);
+      }
+    }
+  }, []);
   return (
 <div
           key={post.title}
@@ -141,14 +150,27 @@ const Feed = ({ className , user, posts }) => {
 
 export async function getServerSideProps(ctx) {
     const { db } = await connectToDatabase();
-    console.group()
-    const post = await db.collection('posts').find({ userId: ObjectId(ctx.query.id )})
-    console.log(await post.toArray())
-    return {
-      props: {
-        posts: JSON.parse(JSON.stringify(await post.toArray())),
-      },
-    }
+    console.log(ctx.query.id)
+    const user = await db.collection('users').findOne({ _id: ObjectId(ctx.query.id) });
+    console.log('hello', await user);
+      if(user.vouchers && user.voucher.length  > 0) {
+
+      const post = await db.collection('posts').find({ userId: ObjectId(ctx.query.id)})
+
+      console.log(await post.toArray())
+      return {
+        props: {
+          posts: JSON.parse(JSON.stringify(await post.toArray())),
+          isTrial: false,
+        },
+      }
+  }
+  return {
+    props: {
+      posts: JSON.parse(JSON.stringify(await post.toArray())),
+      isTrial: true,
+    },
+  }
   }
 
 
