@@ -92,7 +92,7 @@ const Post = ({ post, actionIdx, posts }) => {
                  {icons[post.type]()}
             </span>
           </div>
-          <div className="mt-4">
+          <div className="mt-4 p-0">
             <h3 className="text-lg font-medium">
                 {/* Extend touch target to entire panel */}
                 {post.title}
@@ -130,7 +130,7 @@ const Feed = ({ className , user, posts }) => {
   return(  
       <div className={className}>
     <header className="p-4 border-b-2 bg-indigo-600 text-white">What's new</header>
-    <div className="focus:outline-none bg-gray-200 overflow-scroll shadow divide-y divide-gray-200">
+    <div className="p-0 focus:outline-none shadow divide-y divide-gray-200">
       {posts.map((post, actionIdx) => (<Post post={post} actionIdx={actionIdx} posts={posts} />))}
     </div>
 
