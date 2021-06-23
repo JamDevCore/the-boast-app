@@ -68,18 +68,10 @@ const Question = ({ post, setIsAnswered,  isAnswered }) => {
 }
 
 
-const Post = ({ post, actionIdx, posts, isTrial }) => {
+const Post = ({ post, actionIdx, posts }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isAnswered, setIsAnswered] = useState(false);
-  const [isIframe, setIsIframe] = useState(false);
-  const [isTrialling, setIsTrialling] = useState(false)
-  useEffect(() => {
-    if(typeof window !== 'undefined') {
-      if (window.location !== window.parent.location ) {
-        setIsTrialling(isTrial);
-      }
-    }
-  }, []);
+
   return (
 <div
           key={post.title}
@@ -133,14 +125,29 @@ const Post = ({ post, actionIdx, posts, isTrial }) => {
   )
 }
 
-const Feed = ({ className , user, posts }) => {
+const Feed = ({ className , user, posts, isTrial }) => {
+  const [isIframe, setIsIframe] = useState(false);
+  const [isTrialling, setIsTrialling] = useState(false)
+  useEffect(() => {
+    if(typeof window !== 'undefined') {
+      if (window.location !== window.parent.location ) {
+        setIsTrialling(!isTrial);
+      }
+    }
+  }, []);
   // Sending the post
     console.log(posts)
   return(  
       <div className={className}>
     <header className="p-4 border-b-2 bg-indigo-600 text-white">What's new</header>
     <div className="p-0 focus:outline-none shadow divide-y divide-gray-200">
-      {posts.map((post, actionIdx) => (<Post post={post} actionIdx={actionIdx} posts={posts} />))}
+      {!isTrialling ? posts.map((post, actionIdx) => (<Post post={post} actionIdx={actionIdx} posts={posts} />))
+      : <div>
+                    <h4 className="p-4 text-md font-medium">
+                {/* Extend touch target to entire panel */}
+                This is a trial account. To use Boast in your website or app, select a premium plan or add a voucher code
+            </h4></div>}
+
     </div>
 
   </div>
@@ -153,23 +160,16 @@ export async function getServerSideProps(ctx) {
     console.log(ctx.query.id)
     const user = await db.collection('users').findOne({ _id: ObjectId(ctx.query.id) });
     console.log('hello', await user);
-      if(user.vouchers && user.voucher.length  > 0) {
 
       const post = await db.collection('posts').find({ userId: ObjectId(ctx.query.id)})
-
+      const isTrial = user.vouchers && user.vouchers.length > 0 ? false : true;
       console.log(await post.toArray())
       return {
         props: {
           posts: JSON.parse(JSON.stringify(await post.toArray())),
-          isTrial: false,
+          isTrial,
         },
       }
-  }
-  return {
-    props: {
-      isTrial: true,
-    },
-  }
   }
 
 
