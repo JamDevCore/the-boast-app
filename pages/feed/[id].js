@@ -131,9 +131,9 @@ const Feed = ({ className , user, posts, isTrial }) => {
   const [isTrialling, setIsTrialling] = useState(false)
   useEffect(() => {
     if(typeof window !== 'undefined') {
-      console.log('here')
-      console.log(window.location, window.parent.location)
-      if (window.location.host !== window.parent.location.host) {
+      const url = (window.location != window.parent.location) ? document.referrer : document.location.href;
+      console.log(url, window.location.url)
+      if (window.location !== window.parent.location) {
         setIsTrialling(isTrial);
       }
     }
