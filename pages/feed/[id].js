@@ -134,7 +134,6 @@ const Feed = ({ className , user, posts, isTrial }) => {
       console.log('here')
       console.log(window.location, window.parent.location)
       if (window.location.host !== window.parent.location.host) {
-
         setIsTrialling(isTrial);
       }
     }
