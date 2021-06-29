@@ -73,7 +73,7 @@ const Post = ({ post, actionIdx, posts }) => {
   const [isAnswered, setIsAnswered] = useState(false);
 
   return (
-<div
+        <div
           key={post.title}
           className={classNames(
             actionIdx === 0 ? 'rounded-tl-lg rounded-tr-lg sm:rounded-tr-none' : '',
@@ -166,7 +166,21 @@ export async function getServerSideProps(ctx) {
 
       const post = await db.collection('posts').find({ userId: ObjectId(ctx.query.id)})
       console.log(user)
-      const isTrial = user.vouchers && user.vouchers.length > 0 ? false : true;
+      let isTrial = user.vouchers && user.vouchers.length > 0 ? false : true;
+      isTrial = !!user.plan
+      if(isTrial) {
+        if(!user.viewsThisPeriod) {
+          await db.collection('users').updateOne({ _id: ObjectId(ctx.query.id) }, {
+            $set: {
+              viewsThisPeriod: 1,
+            },
+          });
+        } else {
+          await db.collection('users').updateOne({ _id: ObjectId(ctx.query.id) }, {
+            $inc: viewsThisPeriod,
+          });
+        }
+      }
       console.log(await post.toArray())
       return {
         props: {
