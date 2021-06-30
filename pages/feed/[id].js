@@ -177,7 +177,9 @@ export async function getServerSideProps(ctx) {
           });
         } else {
           await db.collection('users').updateOne({ _id: ObjectId(ctx.query.id) }, {
-            $inc: viewsThisPeriod,
+            $inc: {
+              viewsThisPeriod: 1,
+            }
           });
         }
       }
