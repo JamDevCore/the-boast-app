@@ -6,6 +6,8 @@ import { connectToDatabase } from '../../utils/mongodb';
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import { ObjectId } from 'bson';
 import {getPlanLimits} from '../../utils/get-plan'
+import uniqid from 'uniqid';
+
 import {
   AcademicCapIcon,
   BadgeCheckIcon,
@@ -44,6 +46,14 @@ const icons = {
   const likePost = async (post) => {
     console.log('here')
   await axios.put('/api/posts', { isLike: true, post });
+}
+
+const updateViews = async (userId) => {
+  try {
+  await axios.post('/api/views', { userId });
+  } catch(err) {
+    console.log(err)
+  }
 }
 
 
@@ -126,15 +136,45 @@ const Post = ({ post, actionIdx, posts }) => {
   )
 }
 
+
+const setCookie = (cname, cvalue, exdays)  => {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  let expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+const  getCookie = (cname) => {
+  let name = cname + "=";
+  let decodedCookie = decodeURIComponent(document.cookie);
+  let ca = decodedCookie.split(';');
+  for(let i = 0; i <ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+
 const Feed = ({ className , user, posts, isTrial }) => {
-  console.log('eeeeee', isTrial)
+
   const [isIframe, setIsIframe] = useState(false);
   const [isTrialling, setIsTrialling] = useState(false)
   useEffect(() => {
     if(typeof window !== 'undefined') {
       const url = (window.location != window.parent.location) ? document.referrer : document.location.href;
-      console.log(url, window.location.url)
       if (window.location !== window.parent.location) {
+        if(!isTrial) {
+          const existingUser = getCookie('BoastUserId')
+          if(!existingUser) {
+            setCookie('BoastUserId', uniqid(), 30)
+            updateViews(user.user.id);
+          }
+        }
         setIsTrialling(isTrial);
       }
     }
@@ -167,9 +207,12 @@ export async function getServerSideProps(ctx) {
 
       console.log(user)
       let isTrial = user.vouchers && user.vouchers.length > 0 ? false : true;
-      isTrial = !!user.plan
-
+      isTrial = user.plan ? false : true;
+      console.log(user.plan)
+      console.log(isTrial)
+      console.log(user.viewsThisPeriod)
       if(!isTrial) {
+
         if(!user.viewsThisPeriod) {
           await db.collection('users').updateOne({ _id: ObjectId(ctx.query.id) }, {
             $set: {
@@ -180,10 +223,6 @@ export async function getServerSideProps(ctx) {
           const limit = getPlanLimits(user.plan)
           if(user.viewsThisPeriod > limit) {
             isTrial = true;
-          } else {
-            await db.collection('users').updateOne({ _id: ObjectId(ctx.query.id) }, {
-              $inc: viewsThisPeriod,
-            });
           }
         }
       }
