@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { connectToDatabase } from '../../utils/mongodb';
 import { signIn, signOut, getSession, jwt } from 'next-auth/client'
 import { ObjectId } from 'bson';
+import {getPlanLimits} from '../../utils/get-plan'
 import {
   AcademicCapIcon,
   BadgeCheckIcon,
@@ -162,13 +163,13 @@ export async function getServerSideProps(ctx) {
     const { db } = await connectToDatabase();
     console.log(ctx.query.id)
     const user = await db.collection('users').findOne({ _id: ObjectId(ctx.query.id) });
-    console.log('hello', await user);
+    const post = await db.collection('posts').find({ userId: ObjectId(ctx.query.id)})
 
-      const post = await db.collection('posts').find({ userId: ObjectId(ctx.query.id)})
       console.log(user)
       let isTrial = user.vouchers && user.vouchers.length > 0 ? false : true;
       isTrial = !!user.plan
-      if(isTrial) {
+
+      if(!isTrial) {
         if(!user.viewsThisPeriod) {
           await db.collection('users').updateOne({ _id: ObjectId(ctx.query.id) }, {
             $set: {
@@ -176,14 +177,16 @@ export async function getServerSideProps(ctx) {
             },
           });
         } else {
-          await db.collection('users').updateOne({ _id: ObjectId(ctx.query.id) }, {
-            $inc: {
-              viewsThisPeriod: 1,
-            }
-          });
+          const limit = getPlanLimits(user.plan)
+          if(user.viewsThisPeriod > limit) {
+            isTrial = true;
+          } else {
+            await db.collection('users').updateOne({ _id: ObjectId(ctx.query.id) }, {
+              $inc: viewsThisPeriod,
+            });
+          }
         }
       }
-      console.log(await post.toArray())
       return {
         props: {
           posts: JSON.parse(JSON.stringify(await post.toArray())),
