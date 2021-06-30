@@ -160,7 +160,7 @@ const  getCookie = (cname) => {
   return "";
 }
 
-const Feed = ({ className , user, posts, isTrial }) => {
+const Feed = ({ className , userId, posts, isTrial }) => {
 
   const [isIframe, setIsIframe] = useState(false);
   const [isTrialling, setIsTrialling] = useState(false)
@@ -172,7 +172,7 @@ const Feed = ({ className , user, posts, isTrial }) => {
           const existingUser = getCookie('BoastUserId')
           if(!existingUser) {
             setCookie('BoastUserId', uniqid(), 30)
-            updateViews(user.user.id);
+            updateViews(userId);
           }
         }
         setIsTrialling(isTrial);
@@ -228,6 +228,7 @@ export async function getServerSideProps(ctx) {
       }
       return {
         props: {
+          user: user._id,
           posts: JSON.parse(JSON.stringify(await post.toArray())),
           isTrial,
         },
