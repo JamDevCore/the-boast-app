@@ -12,7 +12,6 @@ const getPlan = (planId) => {
 
 export default getPlan;
 
-
 export const getPlanLimits = (plan) => {
     const limits = {
         Core: 5000,
