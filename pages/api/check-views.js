@@ -16,7 +16,6 @@ export default async function handler(req, res) {
                 const date2 = new Date();
                 console.log(date1.getFullYear(), date1.getMonth()+1, 1)
                 const date3 = new Date(date1.getFullYear(), date1.getMonth()+1, 1);
-                console.log(date3);
                 if(date2 > date3) {
                     await db.collection('users').updateOne({ _id: ObjectId(user._id) }, {
                         $set: {
