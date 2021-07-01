@@ -5,7 +5,6 @@ import {getPlanLimits} from '../../utils/get-plan';
 export default async function handler(req, res) {
     const { body } = req;
     const { db  }= await connectToDatabase();
-    console.log('yolo')
     if(req.method ==='GET') {
         const users = db.collection('users').find();
         users.forEach(async user => {
